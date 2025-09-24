@@ -5,7 +5,7 @@ import json
 import pandas as pd
 import numpy as np
 from data_ingestion import RealTimeDataIngestion
-
+import os
 app = Flask(__name__)
 app.config.from_object('config.Config')
 
