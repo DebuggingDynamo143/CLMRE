@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Oceanography Data - CMLRE Marine Data Platform{% endblock %}
+
+{% block content %}
+<h1>🌊 Oceanographic Data</h1>
+<p>Comprehensive physical and chemical ocean parameters monitoring</p>
+
+<div class="filters">
+    <div class="filter-group">
+        <label for="locationFilter">Location</label>
+        <select id="locationFilter">
+            <option value="all">All Locations</option>
+            {% for location in locations %}
+            <option value="{{ location }}">{{ location }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="filter-group">
+        <label for="parameterFilter">Parameter</label>
+        <select id="parameterFilter">
+            <option value="temperature">Temperature</option>
+            <option value="salinity">Salinity</option>
+            <option value="ph">pH</option>
+            <option value="oxygen">Dissolved Oxygen</option>
+        </select>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-number">{{ locations|length }}</div>
+        <p>Monitoring Locations</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">12</div>
+        <p>Parameters Tracked</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">365</div>
+        <p>Daily Samples</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">99.8%</div>
+        <p>Data Quality</p>
+    </div>
+</div>
+
+<div class="chart-container">
+    <canvas id="oceanChart" height="300"></canvas>
+</div>
+
+<div class="card">
+    <h3>Recent Oceanographic Measurements</h3>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Location</th>
+                <th>Temperature (°C)</th>
+                <th>Salinity (PSU)</th>
+                <th>pH</th>
+                <th>Oxygen (mg/L)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in ocean_data %}
+            <tr>
+                <td>{{ record.month }} 2023</td>
+                <td>{{ record.location }}</td>
+                <td>{{ record.temperature }}</td>
+                <td>{{ record.salinity }}</td>
+                <td>{{ record.ph }}</td>
+                <td>{{ record.dissolved_oxygen }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

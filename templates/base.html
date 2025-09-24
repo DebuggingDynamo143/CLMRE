@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CMLRE Marine Data Platform{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="{{ url_for('index') }}" class="navbar-brand">CMLRE Data Platform</a>
+            <ul class="navbar-nav">
+                <li><a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}active{% endif %}">📊 Dashboard</a></li>
+                <li><a href="{{ url_for('oceanography') }}" class="{% if request.endpoint == 'oceanography' %}active{% endif %}">🌊 Oceanography</a></li>
+                <li><a href="{{ url_for('fisheries') }}" class="{% if request.endpoint == 'fisheries' %}active{% endif %}">🐟 Fisheries</a></li>
+                <li><a href="{{ url_for('molecular') }}" class="{% if request.endpoint == 'molecular' %}active{% endif %}">🧬 Molecular Data</a></li>
+                <li><a href="{{ url_for('correlations') }}" class="{% if request.endpoint == 'correlations' %}active{% endif %}">🤖 AI Correlations</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

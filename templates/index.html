@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - CMLRE Marine Data Platform{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>AI-Driven Marine Data Platform</h1>
+    <p>Unified insights for oceanographic, fisheries, and molecular biodiversity data</p>
+    <p class="last-updated" style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.8;"></p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-number">{{ stats.total_species }}</div>
+        <p>Marine Species</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ stats.ocean_samples }}</div>
+        <p>Ocean Samples</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ stats.genetic_records }}</div>
+        <p>Genetic Records</p>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ stats.strong_correlations }}</div>
+        <p>AI Correlations</p>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <div class="card">
+        <h3>🌡️ Oceanographic Monitoring</h3>
+        <p>Real-time ocean parameters and trends</p>
+        <canvas id="temperatureChart" height="200"></canvas>
+        <div style="margin-top: 1rem;">
+            <span class="last-updated" style="font-size: 0.8rem; color: #666;"></span>
+        </div>
+        <a href="{{ url_for('oceanography') }}" class="btn">Explore Ocean Data</a>
+    </div>
+
+    <div class="card">
+        <h3>🐟 Fisheries Insights</h3>
+        <p>Species distribution and abundance patterns</p>
+        <canvas id="speciesChart" height="200"></canvas>
+        <a href="{{ url_for('fisheries') }}" class="btn">View Fisheries Data</a>
+    </div>
+
+    <div class="card">
+        <h3>🧬 Molecular Biodiversity</h3>
+        <p>eDNA analysis and genetic monitoring</p>
+        <div id="molecularPreview">
+            <p>🔬 Active genetic markers: 5</p>
+            <p>📊 eDNA detection rate: 92%</p>
+            <p>🧪 Species identification: 89% accuracy</p>
+        </div>
+        <a href="{{ url_for('molecular') }}" class="btn">Explore Molecular Data</a>
+    </div>
+
+    <div class="card">
+        <h3>🤖 AI Correlation Engine</h3>
+        <p>Advanced analytics linking ocean parameters with biodiversity</p>
+        <div id="aiInsights">
+            <p>🔍 {{ stats.strong_correlations }} significant correlations detected</p>
+            <p>📊 78% distribution variance explained</p>
+            <p>⚡ Real-time pattern recognition active</p>
+        </div>
+        <a href="{{ url_for('correlations') }}" class="btn">Run AI Analysis</a>
+    </div>
+</div>
+{% endblock %}

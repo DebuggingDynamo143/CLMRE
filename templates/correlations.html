@@ -1,0 +1,854 @@
+{% extends "base.html" %}
+
+{% block title %}AI Correlations - CMLRE Marine Data Platform{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>🤖 AI Correlation Engine</h1>
+    <p>Advanced analytics linking ocean parameters with biodiversity patterns in real-time</p>
+    <p class="last-updated" style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.8;">
+        Last updated: <span id="live-timestamp">Loading...</span>
+    </p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-number" id="total-correlations">{{ total_correlations }}</div>
+        <p>Significant Correlations</p>
+        <small class="stat-trend">↑ 3 this week</small>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" id="avg-r2">0.89</div>
+        <p>Average R² Value</p>
+        <small>Strong relationships</small>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" id="model-accuracy">94%</div>
+        <p>Model Accuracy</p>
+        <small class="stat-trend">↑ 2% this month</small>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number" id="predictive-models">12</div>
+        <p>Predictive Models</p>
+        <small>Active algorithms</small>
+    </div>
+</div>
+
+<!-- Real-time Analysis Control -->
+<div class="card">
+    <div class="analysis-controls">
+        <button id="runAnalysis" class="btn btn-large">
+            🚀 Run AI Correlation Analysis
+        </button>
+        <div class="analysis-options">
+            <label><input type="checkbox" id="include-realtime" checked> Include real-time data</label>
+            <label><input type="checkbox" id="deep-analysis"> Deep analysis mode</label>
+            <label><input type="checkbox" id="cross-validation"> Cross-validation</label>
+        </div>
+    </div>
+    
+    <div id="correlationResults">
+        <div class="analysis-result ready">
+            <h4>💡 Ready for Analysis</h4>
+            <p>Click the button above to run AI correlation analysis on current datasets.</p>
+            <p><strong>Data available:</strong> {{ total_correlations }} correlations, {{ total_correlations * 150 }} data points</p>
+        </div>
+    </div>
+</div>
+
+<!-- Real-time Correlation Chart -->
+<div class="card">
+    <div class="card-header">
+        <h3>📈 Live Correlation Visualization</h3>
+        <span class="last-updated" id="chart-update">Updated: Just now</span>
+    </div>
+    <div class="chart-container">
+        <canvas id="correlationChart" height="300"></canvas>
+    </div>
+    <div class="chart-controls">
+        <select id="chartType">
+            <option value="scatter">Scatter Plot</option>
+            <option value="heatmap">Correlation Heatmap</option>
+            <option value="network">Network Graph</option>
+        </select>
+        <button id="refresh-chart" class="btn-small">🔄 Update Chart</button>
+    </div>
+</div>
+
+<!-- Discovered Correlations -->
+<div class="card">
+    <div class="card-header">
+        <h3>🔍 Discovered Correlations</h3>
+        <span class="last-updated" id="correlations-update">Updated: Just now</span>
+    </div>
+    
+    <div class="correlations-grid">
+        {% for correlation in correlations %}
+        <div class="correlation-card {% if correlation.correlation|abs > 0.7 %}strong{% elif correlation.correlation|abs > 0.4 %}moderate{% else %}weak{% endif %}">
+            <div class="correlation-header">
+                <h4>{{ correlation.parameter1 }} ↔ {{ correlation.parameter2 }}</h4>
+                <span class="correlation-value">{{ "%.3f"|format(correlation.correlation) }}</span>
+            </div>
+            <div class="correlation-details">
+                <div class="correlation-strength">
+                    <span class="strength-badge {{ correlation.strength|lower|replace(' ', '-') }}">
+                        {{ correlation.strength }}
+                    </span>
+                    <span class="impact-badge impact-{{ correlation.impact|lower }}">{{ correlation.impact }} Impact</span>
+                </div>
+                <p class="correlation-description">{{ correlation.description }}</p>
+                <div class="correlation-meta">
+                    <span>Confidence: {{ "%.1f"|format((1 - correlation.correlation|abs) * 100) }}%</span>
+                    <span>Last updated: <span class="update-time">Just now</span></span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- AI Insights Panel -->
+<div class="card">
+    <div class="card-header">
+        <h3>🧠 AI Insights & Predictions</h3>
+        <button id="generate-insights" class="btn-small">💡 Generate Insights</button>
+    </div>
+    <div id="ai-insights">
+        <div class="insight-item">
+            <div class="insight-icon">🔍</div>
+            <div class="insight-content">
+                <h4>Pattern Detected</h4>
+                <p>Temperature shows strong positive correlation with tuna abundance (r=0.87)</p>
+                <span class="insight-confidence">92% confidence</span>
+            </div>
+        </div>
+        <div class="insight-item">
+            <div class="insight-icon">📈</div>
+            <div class="insight-content">
+                <h4>Prediction Alert</h4>
+                <p>Expected 15% increase in sardine population next month based on chlorophyll levels</p>
+                <span class="insight-confidence">88% confidence</span>
+            </div>
+        </div>
+        <div class="insight-item">
+            <div class="insight-icon">⚠️</div>
+            <div class="insight-content">
+                <h4>Anomaly Detected</h4>
+                <p>Unusual salinity patterns detected in Bay of Bengal region</p>
+                <span class="insight-confidence">95% confidence</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Correlation Matrix -->
+<div class="card">
+    <div class="card-header">
+        <h3>🔄 Correlation Matrix</h3>
+        <span class="last-updated" id="matrix-update">Updated: Just now</span>
+    </div>
+    <div class="matrix-container">
+        <table class="correlation-matrix">
+            <thead>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Temperature</th>
+                    <th>Salinity</th>
+                    <th>pH</th>
+                    <th>Oxygen</th>
+                    <th>eDNA</th>
+                    <th>Abundance</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Temperature</strong></td>
+                    <td class="self-correlation">1.000</td>
+                    <td class="positive">0.762</td>
+                    <td class="negative">-0.341</td>
+                    <td class="positive">0.823</td>
+                    <td class="positive">0.874</td>
+                    <td class="positive">0.891</td>
+                </tr>
+                <tr>
+                    <td><strong>Salinity</strong></td>
+                    <td class="positive">0.762</td>
+                    <td class="self-correlation">1.000</td>
+                    <td class="positive">0.452</td>
+                    <td class="positive">0.612</td>
+                    <td class="negative">-0.283</td>
+                    <td class="positive">0.734</td>
+                </tr>
+                <tr>
+                    <td><strong>pH</strong></td>
+                    <td class="negative">-0.341</td>
+                    <td class="positive">0.452</td>
+                    <td class="self-correlation">1.000</td>
+                    <td class="positive">0.523</td>
+                    <td class="positive">0.634</td>
+                    <td class="positive">0.567</td>
+                </tr>
+                <tr>
+                    <td><strong>Oxygen</strong></td>
+                    <td class="positive">0.823</td>
+                    <td class="positive">0.612</td>
+                    <td class="positive">0.523</td>
+                    <td class="self-correlation">1.000</td>
+                    <td class="positive">0.892</td>
+                    <td class="positive">0.945</td>
+                </tr>
+                <tr>
+                    <td><strong>eDNA</strong></td>
+                    <td class="positive">0.874</td>
+                    <td class="negative">-0.283</td>
+                    <td class="positive">0.634</td>
+                    <td class="positive">0.892</td>
+                    <td class="self-correlation">1.000</td>
+                    <td class="positive">0.912</td>
+                </tr>
+                <tr>
+                    <td><strong>Abundance</strong></td>
+                    <td class="positive">0.891</td>
+                    <td class="positive">0.734</td>
+                    <td class="positive">0.567</td>
+                    <td class="positive">0.945</td>
+                    <td class="positive">0.912</td>
+                    <td class="self-correlation">1.000</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// AI Correlation Engine
+class CorrelationEngine {
+    constructor() {
+        this.chart = null;
+        this.isAnalyzing = false;
+        this.initializeChart();
+        this.setupEventListeners();
+        this.startRealTimeUpdates();
+    }
+
+    initializeChart() {
+        const ctx = document.getElementById('correlationChart').getContext('2d');
+        this.chart = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Temperature vs Species Abundance',
+                    data: [
+                        {x: 28.1, y: 120}, {x: 28.5, y: 150}, {x: 29.2, y: 180},
+                        {x: 30.1, y: 250}, {x: 30.8, y: 300}, {x: 30.5, y: 280},
+                        {x: 29.8, y: 220}, {x: 29.5, y: 200}, {x: 29.7, y: 230},
+                        {x: 30.2, y: 270}, {x: 29.8, y: 240}, {x: 29.2, y: 190}
+                    ],
+                    backgroundColor: 'rgba(229, 62, 62, 0.6)',
+                    pointRadius: 8,
+                    pointHoverRadius: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Temperature vs Species Abundance Correlation'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `Temperature: ${context.parsed.x}°C, Abundance: ${context.parsed.y}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Temperature (°C)' },
+                        min: 27,
+                        max: 32
+                    },
+                    y: {
+                        title: { display: true, text: 'Species Abundance' },
+                        min: 100,
+                        max: 350
+                    }
+                }
+            }
+        });
+    }
+
+    setupEventListeners() {
+        // Run Analysis button
+        document.getElementById('runAnalysis').addEventListener('click', () => this.runAnalysis());
+        
+        // Chart controls
+        document.getElementById('refresh-chart').addEventListener('click', () => this.updateChart());
+        document.getElementById('chartType').addEventListener('change', (e) => this.changeChartType(e.target.value));
+        
+        // Generate insights
+        document.getElementById('generate-insights').addEventListener('click', () => this.generateInsights());
+    }
+
+    async runAnalysis() {
+        if (this.isAnalyzing) return;
+        
+        const button = document.getElementById('runAnalysis');
+        const resultsDiv = document.getElementById('correlationResults');
+        
+        this.isAnalyzing = true;
+        button.innerHTML = '🧠 Analyzing...';
+        button.disabled = true;
+        
+        // Show loading state
+        resultsDiv.innerHTML = `
+            <div class="analysis-result analyzing">
+                <div class="loading-spinner"></div>
+                <h4>🤖 AI Analysis in Progress</h4>
+                <p>Processing correlation patterns across datasets...</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="analysis-progress"></div>
+                </div>
+            </div>
+        `;
+
+        try {
+            // Simulate analysis progress
+            await this.simulateAnalysisProgress();
+            
+            // Get analysis options
+            const includeRealtime = document.getElementById('include-realtime').checked;
+            const deepAnalysis = document.getElementById('deep-analysis').checked;
+            const crossValidation = document.getElementById('cross-validation').checked;
+            
+            // Simulate API call
+            const analysisResult = await this.performAnalysis(includeRealtime, deepAnalysis, crossValidation);
+            
+            // Display results
+            resultsDiv.innerHTML = `
+                <div class="analysis-result success">
+                    <h4>✅ Analysis Complete!</h4>
+                    <div class="result-stats">
+                        <div class="stat">
+                            <span class="stat-value">${analysisResult.newCorrelations}</span>
+                            <span class="stat-label">New Correlations Found</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value">${analysisResult.accuracy}%</span>
+                            <span class="stat-label">Model Accuracy</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value">${analysisResult.processingTime}s</span>
+                            <span class="stat-label">Processing Time</span>
+                        </div>
+                    </div>
+                    
+                    <div class="key-findings">
+                        <h5>🔍 Key Findings:</h5>
+                        ${analysisResult.insights.map(insight => `
+                            <div class="finding">
+                                <span class="finding-icon">💡</span>
+                                <span>${insight}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="recommendations">
+                        <h5>🎯 Recommendations:</h5>
+                        ${analysisResult.recommendations.map(rec => `
+                            <div class="recommendation">
+                                <span class="rec-icon">✅</span>
+                                <span>${rec}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            this.updateCorrelations(analysisResult.newCorrelations);
+            this.showNotification('AI analysis completed successfully!', 'success');
+            
+        } catch (error) {
+            resultsDiv.innerHTML = `
+                <div class="analysis-result error">
+                    <h4>❌ Analysis Failed</h4>
+                    <p>${error.message || 'Please try again later.'}</p>
+                    <button onclick="window.correlationEngine.runAnalysis()" class="btn-small">🔄 Retry Analysis</button>
+                </div>
+            `;
+            this.showNotification('Analysis failed. Please try again.', 'error');
+        } finally {
+            button.innerHTML = '🚀 Run Analysis Again';
+            button.disabled = false;
+            this.isAnalyzing = false;
+        }
+    }
+
+    async simulateAnalysisProgress() {
+        const progressBar = document.getElementById('analysis-progress');
+        const steps = ['Loading data...', 'Processing correlations...', 'Training models...', 'Generating insights...'];
+        
+        for (let i = 0; i < steps.length; i++) {
+            if (progressBar) {
+                progressBar.style.width = `${((i + 1) / steps.length) * 100}%`;
+            }
+            await new Promise(resolve => setTimeout(resolve, 800));
+        }
+    }
+
+    async performAnalysis(includeRealtime, deepAnalysis, crossValidation) {
+        // Simulate API call delay
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        return {
+            newCorrelations: Math.floor(Math.random() * 3) + 2,
+            accuracy: (90 + Math.random() * 8).toFixed(1),
+            processingTime: (2.5 + Math.random() * 1.5).toFixed(1),
+            insights: [
+                'Strong correlation detected between phytoplankton blooms and fish abundance',
+                'Temperature anomalies predict species migration patterns with 87% accuracy',
+                'New seasonal pattern identified in coral reef biodiversity',
+                'Machine learning model improved prediction accuracy by 12%'
+            ],
+            recommendations: [
+                'Increase monitoring in identified hotspot regions',
+                'Implement real-time alert system for correlation thresholds',
+                'Expand sensor network for better spatial resolution',
+                'Schedule follow-up analysis for validation'
+            ]
+        };
+    }
+
+    updateChart() {
+        if (this.chart) {
+            // Add new data points
+            const newDataPoint = {
+                x: 28.5 + Math.random() * 3,
+                y: 150 + Math.random() * 200
+            };
+            this.chart.data.datasets[0].data.push(newDataPoint);
+            
+            // Limit to 20 points
+            if (this.chart.data.datasets[0].data.length > 20) {
+                this.chart.data.datasets[0].data.shift();
+            }
+            
+            this.chart.update('none');
+            this.showNotification('Chart updated with latest data', 'info');
+        }
+    }
+
+    changeChartType(type) {
+        if (this.chart) {
+            this.chart.destroy();
+            
+            const ctx = document.getElementById('correlationChart').getContext('2d');
+            if (type === 'heatmap') {
+                this.initializeHeatmap(ctx);
+            } else if (type === 'network') {
+                this.initializeNetworkGraph(ctx);
+            } else {
+                this.initializeChart();
+            }
+        }
+    }
+
+    initializeHeatmap(ctx) {
+        // Simplified heatmap implementation
+        this.chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Temp-Abund', 'Salinity-eDNA', 'pH-Oxygen', 'Temp-pH', 'Oxygen-Abund'],
+                datasets: [{
+                    label: 'Correlation Strength',
+                    data: [0.87, -0.28, 0.52, -0.34, 0.89],
+                    backgroundColor: [
+                        'rgba(72, 187, 120, 0.8)',
+                        'rgba(229, 62, 62, 0.8)',
+                        'rgba(56, 178, 172, 0.8)',
+                        'rgba(229, 62, 62, 0.8)',
+                        'rgba(72, 187, 120, 0.8)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: { display: true, text: 'Correlation Strength Heatmap' }
+                }
+            }
+        });
+    }
+
+    generateInsights() {
+        const insightsContainer = document.getElementById('ai-insights');
+        const newInsight = `
+            <div class="insight-item new">
+                <div class="insight-icon">🔬</div>
+                <div class="insight-content">
+                    <h4>New Insight Generated</h4>
+                    <p>Real-time analysis shows improving correlation strength in coastal regions</p>
+                    <span class="insight-confidence">94% confidence</span>
+                </div>
+            </div>
+        `;
+        
+        insightsContainer.insertAdjacentHTML('afterbegin', newInsight);
+        this.showNotification('New AI insights generated!', 'success');
+    }
+
+    updateCorrelations(newCount) {
+        const totalElem = document.getElementById('total-correlations');
+        const current = parseInt(totalElem.textContent);
+        totalElem.textContent = current + newCount;
+        
+        // Update trend
+        document.querySelector('#total-correlations + .stat-trend').textContent = `↑ ${newCount} new`;
+    }
+
+    startRealTimeUpdates() {
+        // Update timestamps every 30 seconds
+        setInterval(() => this.updateTimestamps(), 30000);
+        
+        // Simulate real-time data updates
+        setInterval(() => this.simulateRealTimeData(), 45000);
+        
+        this.updateTimestamps();
+    }
+
+    updateTimestamps() {
+        const now = new Date().toLocaleString();
+        document.getElementById('live-timestamp').textContent = now;
+        document.querySelectorAll('.last-updated').forEach(el => {
+            el.textContent = `Updated: ${now}`;
+        });
+        document.querySelectorAll('.update-time').forEach(el => {
+            el.textContent = 'Just now';
+        });
+    }
+
+    simulateRealTimeData() {
+        // Randomly update some correlation values
+        document.querySelectorAll('.correlation-value').forEach(elem => {
+            if (Math.random() > 0.7) { // 30% chance to update
+                const current = parseFloat(elem.textContent);
+                const change = (Math.random() * 0.1) - 0.05;
+                const newValue = Math.max(-1, Math.min(1, current + change));
+                elem.textContent = newValue.toFixed(3);
+            }
+        });
+    }
+
+    showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `
+            <span class="notification-icon">${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
+            <span class="notification-text">${message}</span>
+            <button class="notification-close" onclick="this.parentElement.remove()">×</button>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.remove();
+            }
+        }, 4000);
+    }
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    window.correlationEngine = new CorrelationEngine();
+});
+</script>
+
+<style>
+.analysis-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.btn-large {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+}
+
+.analysis-options {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.analysis-options label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.analysis-result {
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin: 1rem 0;
+}
+
+.analysis-result.ready {
+    background: linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%);
+    border-left: 4px solid #3182ce;
+}
+
+.analysis-result.analyzing {
+    background: linear-gradient(135deg, #fffaf0 0%, #feebc8 100%);
+    border-left: 4px solid #ed8936;
+    text-align: center;
+}
+
+.analysis-result.success {
+    background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
+    border-left: 4px solid #48bb78;
+}
+
+.analysis-result.error {
+    background: linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%);
+    border-left: 4px solid #e53e3e;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e2e8f0;
+    border-top: 4px solid #3182ce;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 4px;
+    margin: 1rem 0;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3182ce, #38b2ac);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+.result-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.stat {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 8px;
+}
+
+.stat-value {
+    display: block;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #3182ce;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.key-findings, .recommendations {
+    margin: 1.5rem 0;
+}
+
+.finding, .recommendation {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+}
+
+.finding-icon, .rec-icon {
+    font-size: 1.2rem;
+}
+
+.correlations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.correlation-card {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-left: 4px solid;
+}
+
+.correlation-card.strong { border-left-color: #48bb78; }
+.correlation-card.moderate { border-left-color: #ed8936; }
+.correlation-card.weak { border-left-color: #a0aec0; }
+
+.correlation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.correlation-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #3182ce;
+}
+
+.strength-badge {
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: white;
+}
+
+.very-strong-positive, .strong-positive { background: #48bb78; }
+.moderate-positive { background: #ed8936; }
+.weak-positive { background: #a0aec0; }
+.negative { background: #e53e3e; }
+
+.impact-badge {
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    background: #e2e8f0;
+    color: #4a5568;
+}
+
+.impact-high { background: #fed7d7; color: #c53030; }
+.impact-medium { background: #feebc8; color: #d69e2e; }
+.impact-low { background: #e2e8f0; color: #4a5568; }
+
+.correlation-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 1rem;
+}
+
+.insight-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    margin: 0.5rem 0;
+    background: #f7fafc;
+    border-radius: 8px;
+    border-left: 4px solid #38b2ac;
+}
+
+.insight-item.new {
+    animation: highlight 2s ease-in-out;
+}
+
+.insight-icon {
+    font-size: 1.5rem;
+}
+
+.insight-confidence {
+    font-size: 0.8rem;
+    color: #666;
+    font-style: italic;
+}
+
+.correlation-matrix {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.correlation-matrix th, .correlation-matrix td {
+    padding: 0.75rem;
+    text-align: center;
+    border: 1px solid #e2e8f0;
+}
+
+.correlation-matrix th {
+    background: #3182ce;
+    color: white;
+    font-weight: bold;
+}
+
+.positive { background: rgba(72, 187, 120, 0.2); color: #22543d; }
+.negative { background: rgba(229, 62, 62, 0.2); color: #742a2a; }
+.self-correlation { background: #e2e8f0; font-weight: bold; }
+
+.chart-controls {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    align-items: center;
+}
+
+.notification {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    z-index: 1000;
+    animation: slideIn 0.3s ease-out;
+}
+
+.notification.success { border-left: 4px solid #48bb78; }
+.notification.error { border-left: 4px solid #e53e3e; }
+.notification.info { border-left: 4px solid #3182ce; }
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes highlight {
+    0% { background: rgba(56, 178, 172, 0.3); }
+    100% { background: #f7fafc; }
+}
+
+.stat-trend {
+    font-size: 0.7rem;
+    color: #48bb78;
+    display: block;
+    margin-top: 0.2rem;
+}
+</style>
+{% endblock %}
